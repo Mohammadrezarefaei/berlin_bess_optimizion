@@ -1,76 +1,131 @@
-# 🔋 German BESS Co-Optimization Engine
+import streamlit as st
+import pandas as pd
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://berlinbeappptimizion-appqbldlvi4w5qdepf3vkbn.streamlit.app/)
-[![Test Status](https://img.shields.io/badge/tests-passing-brightgreen.svg)]()
-[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+# Import internal modules
+from src.engine_milp import BESS_CoOptimizer
+from src.utils import load_market_data
 
-A production-ready, high-performance Mixed-Integer Linear Programming (MILP) co-optimization engine designed for Battery Energy Storage Systems (BESS) participating simultaneously in the German **Day-Ahead (DA)** and secondary reserve (**aFRR capacity**) markets.
+# --- PAGE CONFIG ---
+st.set_page_config(page_title="BESS Co-Optimization Engine", layout="wide")
 
----
+# --- CUSTOM CSS FOR CARDS & PLOTS ---
+st.markdown("""
+    <style>
+    .metric-card {
+        background-color: #1e293b;
+        border: 1px solid #334155;
+        padding: 15px 20px;
+        border-radius: 8px;
+        text-align: center;
+    }
+    .metric-title {
+        color: #94a3b8;
+        font-size: 14px;
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+    .metric-value {
+        color: #38bdf8 !important;
+        font-size: 24px;
+        font-weight: 700;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
-## 🚀 Live Demo
-Explore the interactive web application deployed on Streamlit Cloud:  
-👉 **[Open BESS Co-Optimization Dashboard](https://berlinbeappptimizion-appqbldlvi4w5qdepf3vkbn.streamlit.app/)**
+st.title("🔋 German BESS Co-Optimization Engine")
+st.markdown("A demonstration of MILP-based co-optimization for Day-Ahead and aFRR markets.")
 
----
+# --- SIDEBAR ---
+st.sidebar.header("Battery Constraints")
+cap_mwh = st.sidebar.number_input("Capacity (MWh)", min_value=1.0, value=10.0, step=1.0)
+power_mw = st.sidebar.number_input("Max Power (MW)", min_value=1.0, value=5.0, step=1.0)
+efficiency = st.sidebar.slider("Round-Trip Efficiency", 0.7, 1.0, 0.9, step=0.01)
 
-## 📊 Key Features
-- **Simultaneous Revenue Stacking**: Co-optimizes energy arbitrage in the Day-Ahead spot market with capacity reservation payments in the aFRR balancing market.
-- **Advanced MILP Formulation**: Built using Python and optimized via the CBC solver, strictly enforcing physical battery constraints, state-of-charge (SoC) dynamics, and simultaneous power/reserve boundaries.
-- **Robust Data Pipeline**: Features automated in-memory fallback mechanisms to gracefully handle missing or empty dataset inputs without crashing.
-- **Dark-Mode UI/UX**: Designed with a professional dark aesthetic, custom HTML/CSS metric cards, and dynamic Plotly visualizations featuring customized tooltips and legends.
+# --- LOAD DATA ---
+try:
+    df_market = load_market_data("data/sample_market_data.csv")
+except Exception as e:
+    st.error(f"Error loading market data: {e}")
+    st.stop()
 
----
+# --- OPTIMIZATION ENGINE ---
+if st.button("Run MILP Optimization", type="primary"):
+    with st.spinner("Running CBC Solver..."):
+        optimizer = BESS_CoOptimizer(capacity_mwh=cap_mwh, max_power_mw=power_mw, efficiency=efficiency)
+        optimized_df = optimizer.optimize(df_market)
+        
+        st.success("Optimization Completed Successfully!")
+        
+        # --- FINANCIAL METRICS ---
+        total_da_revenue = (optimized_df['Optimized_Discharge_MW'] * optimized_df['DA_Price']).sum() - \
+                           (optimized_df['Optimized_Charge_MW'] * optimized_df['DA_Price']).sum()
+        total_afrr_revenue = (optimized_df['Optimized_Reserve_MW'] * optimized_df['Capacity_Price']).sum()
+        total_net = total_da_revenue + total_afrr_revenue
+        
+        # --- CUSTOM HTML METRIC CARDS ---
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.markdown(f"""
+                <div class="metric-card">
+                    <div class="metric-title">Day-Ahead Revenue</div>
+                    <div class="metric-value">€ {total_da_revenue:,.2f}</div>
+                </div>
+            """, unsafe_allow_html=True)
+            
+        with col2:
+            st.markdown(f"""
+                <div class="metric-card">
+                    <div class="metric-title">aFRR Capacity Revenue</div>
+                    <div class="metric-value">€ {total_afrr_revenue:,.2f}</div>
+                </div>
+            """, unsafe_allow_html=True)
+            
+        with col3:
+            st.markdown(f"""
+                <div class="metric-card">
+                    <div class="metric-title">Total Net Profit</div>
+                    <div class="metric-value">€ {total_net:,.2f}</div>
+                </div>
+            """, unsafe_allow_html=True)
 
-## 📈 Visualizations & UI Components
-The dashboard provides comprehensive, publication-grade visual analytics:
-- **Interactive 24-Hour Dispatch Profile**: Multi-axis Plotly chart displaying charging schedules (Green), discharging profiles (Red), aFRR reserve allocations (Purple), and overlaid Day-Ahead price spikes (Orange dotted line).
-- **Custom Themed Tooltips & Legends**: Styled with dark-mode matching backgrounds and high-contrast text for seamless readability.
-- **Dynamic Financial Metrics**: Real-time calculated KPI cards highlighting Day-Ahead revenue, aFRR capacity revenue, and total net profit.
+        st.markdown("<br>", unsafe_allow_html=True)
 
----
+        # --- PLOTLY CHART (بالا آمدن گراف و بخش بصری) ---
+        st.subheader("24-Hour Dispatch Profile")
+        fig = make_subplots(specs=[[{"secondary_y": True}]])
+        hours = optimized_df.index.tolist()
 
-## 📋 Optimization Results Table
-The engine outputs a detailed, hour-by-hour operational and financial schedule:
-- **`Timestamp`**: Hourly resolution across the optimization horizon.
-- **`DA_Price` / `Capacity_Price`**: Market clearing prices for energy (€/MWh) and aFRR capacity (€/MW).
-- **`Optimized_Charge_MW` / `Optimized_Discharge_MW`**: Optimal power dispatched for energy arbitrage.
-- **`Optimized_Reserve_MW`**: Allocated capacity for secondary frequency containment reserve (aFRR).
-- **`Optimized_SoC_MWh`**: Resulting state-of-charge tracking energy content evolution.
+        fig.add_trace(go.Bar(x=hours, y=optimized_df['Optimized_Charge_MW'], name="Charge (MW)", marker_color='#00CC96'), secondary_y=False)
+        fig.add_trace(go.Bar(x=hours, y=-optimized_df['Optimized_Discharge_MW'], name="Discharge (MW)", marker_color='#EF553B'), secondary_y=False)
+        fig.add_trace(go.Bar(x=hours, y=optimized_df['Optimized_Reserve_MW'], name="aFRR Reserve (MW)", marker_color='#AB63FA'), secondary_y=False)
+        
+        fig.add_trace(go.Scatter(x=hours, y=optimized_df['DA_Price'], name="DA Price (€/MWh)", line=dict(color='#FFA15A', dash='dot')), secondary_y=True)
 
----
+        fig.update_layout(
+            template="plotly_dark", 
+            barmode='relative', 
+            hovermode="x unified",
+            margin=dict(l=20, r=20, t=40, b=20),
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            legend=dict(
+                bgcolor="#581c87",
+                bordercolor="#9333ea",
+                borderwidth=1,
+                font=dict(color="#ffffff", family="sans-serif", size=12)
+            ),
+            hoverlabel=dict(
+                bgcolor="#581c87",
+                bordercolor="#9333ea",
+                font=dict(family="sans-serif", size=12, color="#ffffff")
+            )
+        )
+        st.plotly_chart(fig, use_container_width=True)
 
-## 🛠️ Tech Stack
-- **Core Optimization**: Python, PuLP (MILP Modeling), CBC Solver
-- **Data Manipulation**: Pandas, NumPy
-- **Data Visualization**: Plotly (Subplots, Interactive Dashboards, Custom Layouts)
-- **Web Framework**: Streamlit
-
----
-
-## ⚙️ Mathematical Formulation (Overview)
-The optimization model maximizes total revenue over a 24-hour horizon:
-
-$$\max \sum_{t} \left( \text{Discharge}_{t} \cdot \pi^{\text{DA}}_t - \text{Charge}_{t} \cdot \pi^{\text{DA}}_t + \text{Reserve}_{t} \cdot \pi^{\text{aFRR}}_t \right)$$
-
-Subject to:
-1. **Power Limits**: Total power allocated to charging, discharging, and aFRR reserves cannot exceed the inverter's maximum power rating.
-2. **SoC Dynamics**: Tracking battery energy content accounting for round-trip efficiency ($\eta$).
-3. **Mutual Exclusivity / Operational Integrity**: Preventing simultaneous high-intensity conflicting states where physically constrained.
-
----
-
-## 🗂️ Project Structure
-```text
-berlin_bess_optimizer/
-│
-├── app.py                  # Main Streamlit dashboard application
-├── requirements.txt        # Python package dependencies
-├── README.md               # Project documentation
-├── data/
-│   └── sample_market_data.csv  # 24-hour DA and aFRR price profiles
-└── src/
-    ├── __init__.py
-    ├── engine_milp.py      # MILP co-optimization mathematical model
-    └── utils.py            # Robust data loading and in-memory fallbacks
+        # --- DATA TABLE (انتقال جدول به بخش پایین‌تر) ---
+        st.subheader("Optimization Results Data")
+        st.dataframe(optimized_df.style.highlight_max(axis=0))
