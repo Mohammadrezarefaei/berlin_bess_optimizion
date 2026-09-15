@@ -32,12 +32,6 @@ st.markdown("""
         font-size: 24px;
         font-weight: 700;
     }
-    /* اجبار رنگ بنفش تیره برای پس‌زمینه کادرهای راهنما و هاور در پلاتلی */
-    .js-plotly-plot .plotly .legend rect, 
-    .js-plotly-plot .plotly .hoverlayer .bg {
-        fill: #311042 !important;
-        stroke: #7c3aed !important;
-    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -119,15 +113,15 @@ if st.button("Run MILP Optimization", type="primary"):
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
             legend=dict(
-                bgcolor="#311042",                # پس‌زمینه بنفش تیره برای لجند
-                bordercolor="#7c3aed",
+                bgcolor="#ffffff",                # پس‌زمینه سفید خالص برای لِجند
+                bordercolor="#cbd5e1",
                 borderwidth=1,
-                font=dict(color="#f1f5f9")        # متن روشن
+                font=dict(color="#000000", family="sans-serif", size=12)  # متن کاملاً مشکی
             ),
             hoverlabel=dict(
-                bgcolor="#311042",                # پس‌زمینه بنفش تیره برای هاور
-                bordercolor="#7c3aed",
-                font=dict(family="sans-serif", size=12, color="#f1f5f9")  # متن روشن داخل هاور
+                bgcolor="#ffffff",                # پس‌زمینه سفید خالص برای هاور
+                bordercolor="#cbd5e1",
+                font=dict(family="sans-serif", size=12, color="#000000")  # متن کاملاً مشکی داخل هاور
             )
         )
         st.plotly_chart(fig, use_container_width=True)
