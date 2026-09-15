@@ -11,15 +11,17 @@ from src.utils import load_market_data
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="BESS Co-Optimization Engine", layout="wide")
 
-# --- CUSTOM CSS FOR METRIC TEXT COLOR (آبی کردن رنگ متن داخل جعبه‌ها) ---
+# --- CUSTOM CSS FOR METRIC TEXT COLOR (آبی کردن رنگ اعداد داخل جعبه‌ها) ---
 st.markdown("""
     <style>
-    /* تغییر رنگ مقادیر داخل متریک‌ها به آبی جذاب */
-    [data-testid="stMetricValue"] {
+    div[data-testid="stMetricValue"], 
+    div[data-testid="stMetricValue"] > div, 
+    div[data-testid="stMetricValue"] span {
         color: #38bdf8 !important;
     }
-    /* تغییر رنگ عناوین بالای متریک‌ها */
-    [data-testid="stMetricLabel"] {
+    div[data-testid="stMetricLabel"], 
+    div[data-testid="stMetricLabel"] > div, 
+    div[data-testid="stMetricLabel"] span {
         color: #94a3b8 !important;
     }
     </style>
