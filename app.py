@@ -11,18 +11,26 @@ from src.utils import load_market_data
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="BESS Co-Optimization Engine", layout="wide")
 
-# --- CUSTOM CSS FOR METRIC TEXT COLOR (آبی کردن رنگ اعداد داخل جعبه‌ها) ---
+# --- CUSTOM CSS FOR CARDS & PLOTS ---
 st.markdown("""
     <style>
-    div[data-testid="stMetricValue"], 
-    div[data-testid="stMetricValue"] > div, 
-    div[data-testid="stMetricValue"] span {
-        color: #38bdf8 !important;
+    .metric-card {
+        background-color: #1e293b;
+        border: 1px solid #334155;
+        padding: 15px 20px;
+        border-radius: 8px;
+        text-align: center;
     }
-    div[data-testid="stMetricLabel"], 
-    div[data-testid="stMetricLabel"] > div, 
-    div[data-testid="stMetricLabel"] span {
-        color: #94a3b8 !important;
+    .metric-title {
+        color: #94a3b8;
+        font-size: 14px;
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+    .metric-value {
+        color: #38bdf8 !important;
+        font-size: 24px;
+        font-weight: 700;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -55,11 +63,36 @@ if st.button("Run MILP Optimization", type="primary"):
         total_da_revenue = (optimized_df['Optimized_Discharge_MW'] * optimized_df['DA_Price']).sum() - \
                            (optimized_df['Optimized_Charge_MW'] * optimized_df['DA_Price']).sum()
         total_afrr_revenue = (optimized_df['Optimized_Reserve_MW'] * optimized_df['Capacity_Price']).sum()
+        total_net = total_da_revenue + total_afrr_revenue
         
+        # --- CUSTOM HTML METRIC CARDS ---
         col1, col2, col3 = st.columns(3)
-        col1.metric("Day-Ahead Revenue", f"€ {total_da_revenue:,.2f}")
-        col2.metric("aFRR Capacity Revenue", f"€ {total_afrr_revenue:,.2f}")
-        col3.metric("Total Net Profit", f"€ {(total_da_revenue + total_afrr_revenue):,.2f}")
+        
+        with col1:
+            st.markdown(f"""
+                <div class="metric-card">
+                    <div class="metric-title">Day-Ahead Revenue</div>
+                    <div class="metric-value">€ {total_da_revenue:,.2f}</div>
+                </div>
+            """, unsafe_allow_html=True)
+            
+        with col2:
+            st.markdown(f"""
+                <div class="metric-card">
+                    <div class="metric-title">aFRR Capacity Revenue</div>
+                    <div class="metric-value">€ {total_afrr_revenue:,.2f}</div>
+                </div>
+            """, unsafe_allow_html=True)
+            
+        with col3:
+            st.markdown(f"""
+                <div class="metric-card">
+                    <div class="metric-title">Total Net Profit</div>
+                    <div class="metric-value">€ {total_net:,.2f}</div>
+                </div>
+            """, unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
 
         # --- PLOTLY CHART ---
         st.subheader("24-Hour Dispatch Profile")
