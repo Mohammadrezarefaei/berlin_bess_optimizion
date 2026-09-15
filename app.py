@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
@@ -9,6 +10,21 @@ from src.utils import load_market_data
 
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="BESS Co-Optimization Engine", layout="wide")
+
+# --- CUSTOM CSS FOR METRIC TEXT COLOR (آبی کردن رنگ متن داخل جعبه‌ها) ---
+st.markdown("""
+    <style>
+    /* تغییر رنگ مقادیر داخل متریک‌ها به آبی جذاب */
+    [data-testid="stMetricValue"] {
+        color: #38bdf8 !important;
+    }
+    /* تغییر رنگ عناوین بالای متریک‌ها */
+    [data-testid="stMetricLabel"] {
+        color: #94a3b8 !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 st.title("🔋 German BESS Co-Optimization Engine")
 st.markdown("A demonstration of MILP-based co-optimization for Day-Ahead and aFRR markets.")
 
@@ -21,8 +37,8 @@ efficiency = st.sidebar.slider("Round-Trip Efficiency", 0.7, 1.0, 0.9, step=0.01
 # --- LOAD DATA ---
 try:
     df_market = load_market_data("data/sample_market_data.csv")
-except FileNotFoundError as e:
-    st.error(str(e))
+except Exception as e:
+    st.error(f"Error loading market data: {e}")
     st.stop()
 
 # --- OPTIMIZATION ENGINE ---
