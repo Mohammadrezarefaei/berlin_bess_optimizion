@@ -11,7 +11,7 @@ from src.utils import load_market_data
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="BESS Co-Optimization Engine", layout="wide")
 
-# --- CUSTOM CSS FOR CARDS & PLOTS ---
+# --- CUSTOM CSS FOR CARDS & PLOTS (تغییر پس‌زمینه کادرهای پلاتلی به مشکی) ---
 st.markdown("""
     <style>
     .metric-card {
@@ -31,6 +31,12 @@ st.markdown("""
         color: #38bdf8 !important;
         font-size: 24px;
         font-weight: 700;
+    }
+    /* اجبار رنگ مشکی برای پس‌زمینه کادرهای راهنما و هاور در پلاتلی */
+    .js-plotly-plot .plotly .legend rect, 
+    .js-plotly-plot .plotly .hoverlayer .bg {
+        fill: #000000 !important;
+        stroke: #334155 !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -113,15 +119,15 @@ if st.button("Run MILP Optimization", type="primary"):
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
             legend=dict(
-                bgcolor="#0b0f19",                # پس‌زمینه کاملاً مشکی/تیره برای لجند
+                bgcolor="#000000",
                 bordercolor="#334155",
                 borderwidth=1,
-                font=dict(color="#f1f5f9")        # متن روشن و خوانا
+                font=dict(color="#f1f5f9")
             ),
             hoverlabel=dict(
-                bgcolor="#0b0f19",                # پس‌زمینه کاملاً مشکی/تیره برای هاور
+                bgcolor="#000000",
                 bordercolor="#334155",
-                font=dict(family="sans-serif", size=12, color="#f1f5f9")  # متن روشن داخل هاور
+                font=dict(family="sans-serif", size=12, color="#f1f5f9")
             )
         )
         st.plotly_chart(fig, use_container_width=True)
