@@ -113,15 +113,15 @@ if st.button("Run MILP Optimization", type="primary"):
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
             legend=dict(
-                bgcolor="rgba(30, 41, 59, 0.9)",  # پس‌زمینه آبی تیره برای لجند
+                bgcolor="#0b0f19",                # پس‌زمینه کاملاً مشکی/تیره برای لجند
                 bordercolor="#334155",
                 borderwidth=1,
-                font=dict(color="#111827")        # متن مشکی تیره
+                font=dict(color="#f1f5f9")        # متن روشن و خوانا
             ),
             hoverlabel=dict(
-                bgcolor="#1e293b",                # پس‌زمینه آبی تیره برای هاور
+                bgcolor="#0b0f19",                # پس‌زمینه کاملاً مشکی/تیره برای هاور
                 bordercolor="#334155",
-                font=dict(family="sans-serif", size=12, color="#111827")  # متن مشکی تیره داخل هاور
+                font=dict(family="sans-serif", size=12, color="#f1f5f9")  # متن روشن داخل هاور
             )
         )
         st.plotly_chart(fig, use_container_width=True)
