@@ -23,8 +23,11 @@ Explore the interactive web application deployed on Streamlit Cloud:
 
 ---
 
-## 📈 Visualizations & UI Components (Interactive Graphs)
-The dashboard provides comprehensive, publication-grade visual analytics positioned at the forefront of the execution flow:
+## 📈 Visualizations & UI Components (Interactive Dashboard Demo)
+The dashboard provides comprehensive, publication-grade visual analytics positioned right at the forefront:
+
+![BESS Optimization Demo](bess_optimization_demo.gif)
+
 - **Interactive 24-Hour Dispatch Profile**: Multi-axis Plotly chart displaying charging schedules (Green), discharging profiles (Red), aFRR reserve allocations (Purple), and overlaid Day-Ahead price spikes (Orange dotted line).
 - **Custom Themed Tooltips & Legends**: Styled with dark-mode matching backgrounds and high-contrast text for seamless readability.
 - **Dynamic Financial Metrics**: Real-time calculated KPI cards highlighting Day-Ahead revenue, aFRR capacity revenue, and total net profit.
@@ -68,6 +71,7 @@ berlin_bess_optimizer/
 ├── app.py                  # Main Streamlit dashboard application
 ├── requirements.txt        # Python package dependencies
 ├── README.md               # Project documentation
+├── bess_optimization_demo.gif # UI/UX execution demo animation
 ├── data/
 │   └── sample_market_data.csv  # 24-hour DA and aFRR price profiles
 └── src/
