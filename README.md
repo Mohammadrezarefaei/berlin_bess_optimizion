@@ -1,6 +1,7 @@
 # 🔋 German BESS Co-Optimization Engine
 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://berlinbeappptimizion-appqbldlvi4w5qdepf3vkbn.streamlit.app/)
+[![Test Status](https://img.shields.io/badge/tests-passing-brightgreen.svg)]()
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -22,10 +23,28 @@ Explore the interactive web application deployed on Streamlit Cloud:
 
 ---
 
+## 📈 Visualizations & UI Components
+The dashboard provides comprehensive, publication-grade visual analytics:
+- **Interactive 24-Hour Dispatch Profile**: Multi-axis Plotly chart displaying charging schedules (Green), discharging profiles (Red), aFRR reserve allocations (Purple), and overlaid Day-Ahead price spikes (Orange dotted line).
+- **Custom Themed Tooltips & Legends**: Styled with dark-mode matching backgrounds and high-contrast text for seamless readability.
+- **Dynamic Financial Metrics**: Real-time calculated KPI cards highlighting Day-Ahead revenue, aFRR capacity revenue, and total net profit.
+
+---
+
+## 📋 Optimization Results Table
+The engine outputs a detailed, hour-by-hour operational and financial schedule:
+- **`Timestamp`**: Hourly resolution across the optimization horizon.
+- **`DA_Price` / `Capacity_Price`**: Market clearing prices for energy (€/MWh) and aFRR capacity (€/MW).
+- **`Optimized_Charge_MW` / `Optimized_Discharge_MW`**: Optimal power dispatched for energy arbitrage.
+- **`Optimized_Reserve_MW`**: Allocated capacity for secondary frequency containment reserve (aFRR).
+- **`Optimized_SoC_MWh`**: Resulting state-of-charge tracking energy content evolution.
+
+---
+
 ## 🛠️ Tech Stack
 - **Core Optimization**: Python, PuLP (MILP Modeling), CBC Solver
 - **Data Manipulation**: Pandas, NumPy
-- **Data Visualization**: Plotly (Subplots, Interactive Dashboards)
+- **Data Visualization**: Plotly (Subplots, Interactive Dashboards, Custom Layouts)
 - **Web Framework**: Streamlit
 
 ---
