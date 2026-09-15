@@ -109,7 +109,10 @@ if st.button("Run MILP Optimization", type="primary"):
             template="plotly_dark", 
             barmode='relative', 
             hovermode="x unified",
-            margin=dict(l=20, r=20, t=40, b=20)
+            margin=dict(l=20, r=20, t=40, b=20),
+            legend=dict(
+                font=dict(color="#38bdf8")  # آبی کردن متن داخل لِجند نمودار
+            )
         )
         st.plotly_chart(fig, use_container_width=True)
 
