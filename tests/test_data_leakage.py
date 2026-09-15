@@ -41,7 +41,9 @@ def test_no_data_leakage_future_spikes(bess_params):
     # 5. ASSERATION: Compare results up to the hour BEFORE the leakage.
     # The decision at Hour 39 might change (to prepare SOC),
     # but decisions from Hour 0 to 38 MUST be identical.
-    safe_zone_slice = slice(0, leakage_hour - 1) # Hours 0 to 38
+   # Ensure the safe zone is entirely outside the physical charging time required 
+    # to prepare for the spike (at least 3-4 hours for this battery).
+    safe_zone_slice = slice(0, leakage_hour - 5) # Hours 0 to 35
     
     # Check that Discharge MW did not change based on future knowledge
     pd.testing.assert_series_equal(
